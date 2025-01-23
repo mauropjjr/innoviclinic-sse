@@ -1,46 +1,39 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import {  Subject } from 'rxjs';
-import { MessageDataDto } from '../dtos/MessageDataDto';
+import { Subject } from 'rxjs';
+
+import { NotificationDto } from '../dtos/notification.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AgendaService {
-  // private readonly emitter: EventEmitter;
-  // private channel: string;
+  private channels: Map<number, Subject<any>> = new Map();
+  constructor(
+    @InjectModel('Notification')
+    private readonly notificationModel: Model<Notification>,
+  ) {}
 
-  // constructor() {
-  //   this.emitter = new EventEmitter();
-  // }
-  // subscribe(id: string) {
-  //   this.channel = id;
-  //   return fromEvent(this.emitter, this.channel);
-  // }
 
-  // emit(data: MessageDataDto) {
-  //   this.channel = data.empresa_id;
-  //   this.emitter.emit(this.channel, { data });
-  // }
-  private channels: Map<string, Subject<any>> = new Map();
-
-  subscribe(id: string) {
+  subscribe(id: number) {
     if (!this.channels.has(id)) {
       this.channels.set(id, new Subject());
     }
     return this.channels.get(id).asObservable();
   }
 
-  emit(data: MessageDataDto) {
+  emit(data: NotificationDto) {
     const channel = this.channels.get(data.empresa_id);
+    this.notificationModel.create(data);
     if (channel) {
       channel.next({ data });
     }
   }
 
-  emitHeartbeat(id: string) {
+  emitHeartbeat(id: number) {
     const channel = this.channels.get(id);
     if (channel) {
       channel.next({ data: { type: 'heartbeat', message: 'ping' } });
     }
   }
-
 }

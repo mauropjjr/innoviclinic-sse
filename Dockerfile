@@ -12,3 +12,8 @@ EXPOSE 3000
 
 # Command to run the application
 CMD ["node", "dist/main"]
+
+
+#URL_API='https://api.innoviclinic.com.br/api/public/'
+#URL_SSE='https://sse.innoviclinic.com.br/'
+#HOST_MONGODB='mongodb://root:root@213.199.34.152/admin'
