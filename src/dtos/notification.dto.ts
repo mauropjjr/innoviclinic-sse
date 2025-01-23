@@ -70,6 +70,9 @@ export class NotificationDto {
   @IsNotEmpty()
   mensagem: string;
 
+  @IsOptional()
+  emitting: string;
+
   @IsObject()
   @ValidateNested()
   @Type(() => AgendaDto)

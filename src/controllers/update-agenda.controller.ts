@@ -15,7 +15,7 @@ export class UpdateAgendaController {
 
   @Post()
   sendMessage(@Body() c: NotificationDto, @Res() res) {
-    // c.emitting=  new Date().toISOString();
+    c.emitting=  new Date().toISOString();
     console.log(c);
     this.agendaService.emit(c);
     res.status(200).send({ status: 'Message sent' });
@@ -27,7 +27,7 @@ export class UpdateAgendaController {
   //   return this.agendaService.subscribe(id);
   // }
   @Sse('stream/:id')
-  events(@Param('id') id: number) {
+  events(@Param('id') id: string) {
     console.log(`Iniciando conexão SSE para o ID: ${id}`);
     return new Observable((observer) => {
       const subscription = this.agendaService.subscribe(id).subscribe({

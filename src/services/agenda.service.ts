@@ -8,14 +8,14 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class AgendaService {
-  private channels: Map<number, Subject<any>> = new Map();
+  private channels: Map<string, Subject<any>> = new Map();
   constructor(
     @InjectModel('Notification')
     private readonly notificationModel: Model<Notification>,
   ) {}
 
 
-  subscribe(id: number) {
+  subscribe(id: string) {
     if (!this.channels.has(id)) {
       this.channels.set(id, new Subject());
     }
@@ -23,14 +23,14 @@ export class AgendaService {
   }
 
   emit(data: NotificationDto) {
-    const channel = this.channels.get(data.empresa_id);
+    const channel = this.channels.get(data.empresa_id.toString());
     this.notificationModel.create(data);
     if (channel) {
       channel.next({ data });
     }
   }
 
-  emitHeartbeat(id: number) {
+  emitHeartbeat(id: string) {
     const channel = this.channels.get(id);
     if (channel) {
       channel.next({ data: { type: 'heartbeat', message: 'ping' } });
