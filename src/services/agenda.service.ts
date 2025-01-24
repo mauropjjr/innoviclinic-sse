@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { NotificationDto } from '../dtos/notification.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+//import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class AgendaService {
@@ -12,6 +13,7 @@ export class AgendaService {
   constructor(
     @InjectModel('Notification')
     private readonly notificationModel: Model<Notification>,
+    //private readonly notificationService: NotificationService
   ) {}
 
 
@@ -23,7 +25,9 @@ export class AgendaService {
   }
 
   emit(data: NotificationDto) {
+    console.log('emitindo notificacao');
     const channel = this.channels.get(data.empresa_id.toString());
+    console.log(">>>>", data);
     this.notificationModel.create(data);
     if (channel) {
       channel.next({ data });

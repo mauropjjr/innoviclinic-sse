@@ -14,6 +14,8 @@ export class NotificationService {
   ) {}
 
   async create(notification: NotificationDto): Promise<Notification> {
+    console.log('salvar notificacao');
+    console.log(notification);
     const createdAgenda = new this.notificationModel(notification);
     return createdAgenda.save();
   }
@@ -52,20 +54,37 @@ export class NotificationService {
   }
 
   // Busca todas as notificações
-  async findAll(
-    page: number = 1,
-    limit: number = 25,
-  ): Promise<{ data: Notification[]; total: number }> {
+  async findAll(profissionalId: number, page: number = 1, limit: number = 20) {
     const skip = (page - 1) * limit;
+    const today = new Date(); // Data atual
+    const startOfYesterday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - 1,
+    );
+    // Filtro para profissional_id e createdAt maior que hoje
+    const filter = {
+      profissional_id: profissionalId,
+      createdAt: { $gte: startOfYesterday }, // createdAt maior que a data atual
+    };
 
+    // Busca as notificações filtradas e ordenadas por createdAt (mais recentes primeiro)
     const data = await this.notificationModel
-      .find()
+      .find(filter)
+      .sort({ createdAt: -1 }) // Ordena por createdAt em ordem decrescente
       .skip(skip)
       .limit(limit)
       .exec();
 
-    const total = await this.notificationModel.countDocuments().exec(); // Total de documentos
+    // Conta o total de notificações que correspondem ao filtro
+    const total = await this.notificationModel.countDocuments(filter).exec();
 
-    return { data, total };
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 }

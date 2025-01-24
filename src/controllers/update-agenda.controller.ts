@@ -16,7 +16,7 @@ export class UpdateAgendaController {
   @Post()
   sendMessage(@Body() c: NotificationDto, @Res() res) {
     c.emitting=  new Date().toISOString();
-    console.log(c);
+    //console.log(c);
     this.agendaService.emit(c);
     res.status(200).send({ status: 'Message sent' });
   }
